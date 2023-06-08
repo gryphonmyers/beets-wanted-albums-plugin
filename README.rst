@@ -1,4 +1,4 @@
-Beets Wanted Albums Plugin for Beets
+Wanted Albums Plugin for Beets
 ==============================
 
 Plugin for the music library manager,
