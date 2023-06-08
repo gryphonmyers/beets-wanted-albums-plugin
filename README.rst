@@ -36,7 +36,7 @@ here are some suggestions:
 
 * Trigger a notification via your messaging platform of choice
 * Add the album to a playlist on your streaming platform of choice
-* Add the album to your Amazon wishlist
+* Add the album to your shopping wishlist
 * Automate purchase of album, adding purchased files to your Beets import folder
 
 Whatever you want to do is up to you, just make sure to set the ``exec_command`` key of
