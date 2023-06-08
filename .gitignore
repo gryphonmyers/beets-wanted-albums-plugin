@@ -1,0 +1,5 @@
+command.sh
+config.yml
+library.db
+.vscode
+virtual-env
