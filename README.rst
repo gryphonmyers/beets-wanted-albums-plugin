@@ -4,7 +4,6 @@ Beets Wanted Albums Plugin for Beets
 Plugin for the music library manager,
 `Beets <http://beets.radbox.org/>`__. Discover new or old 
 albums missing from your music collection, and take action!
-`muspy <https://muspy.com/>`__.
 
 Installation
 ------------
