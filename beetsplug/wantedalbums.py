@@ -1,6 +1,8 @@
 from beets.plugins import BeetsPlugin
 from beets.ui import Subcommand, decargs, print_, input_yn, UserError
 from beets import config
+from beets.util import bytestring_path
+import os
 import musicbrainzngs
 import time
 import subprocess
@@ -222,19 +224,22 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
 
     def _print_artist_tuple(self, artist):
         print_('name: {1} | mb_id: {0}'.format(*artist))
-            
+    
     def _save_state(self, state):
         """Writes the state dictionary out to disk."""
         try:
-            with open(self.config['statefile'].as_filename(), 'wb') as f:
+            with open(self.get_state_path(), 'wb') as f:
                 pickle.dump(state, f)
         except OSError as exc:
             self._log.error('state file could not be written: {0}', exc)
 
+    def get_state_path(self):
+        return os.path.join(bytestring_path(config.config_dir()), bytestring_path(self.config['statefile'].as_str()))
+    
     def _open_state(self):
         """Reads the state file, returning a dictionary."""
         try:
-            with open(self.config['statefile'].as_filename(), 'rb') as f:
+            with open(self.get_state_path(), 'rb') as f:
                 state = pickle.load(f)
         except Exception as exc:
             # The `pickle` module can emit all sorts of exceptions during
