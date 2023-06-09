@@ -1,10 +1,10 @@
 from beets.plugins import BeetsPlugin
 from beets.ui import Subcommand, decargs, print_, input_yn, UserError
-from beets.importer import _open_state, _save_state
 from beets import config
 import musicbrainzngs
 import time
 import subprocess
+import pickle
 
 MONITORED_ARTISTS_KEY = 'monitoredartists'
 WANTED_RELEASE_GROUPS_KEY = 'wantedreleasegroups'
@@ -13,7 +13,8 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
     def __init__(self):
         super().__init__()
         self.config.add({
-            'exec_timeout': 5000
+            'exec_timeout': 5000,
+            'statefile': 'wantedalbums.pickle'
         })
         self.import_stages = [self.on_import]
 
@@ -118,7 +119,7 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
             self._save_state(state)
 
     def list_monitored_artists(self, lib, opts, args):
-        state = _open_state()
+        state = self._open_state()
         
         if MONITORED_ARTISTS_KEY not in state:
             self._log.info('No monitored artists')
@@ -136,7 +137,7 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
 
     
     def list_wanted_albums(self, lib, opts, args):
-        state = _open_state()
+        state = self._open_state()
         
         for artist_id in state[WANTED_RELEASE_GROUPS_KEY]:
             for release_group in state[WANTED_RELEASE_GROUPS_KEY][artist_id]:
@@ -144,7 +145,7 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
                     print_('{0} - {1} - {2}'.format(state[MONITORED_ARTISTS_KEY][artist_id][1], release_group['title'],  release_group['status']))
 
     def exec_wanted_albums(self, lib, opts, args):
-        state = _open_state()
+        state = self._open_state()
         for artist_id in state[WANTED_RELEASE_GROUPS_KEY]:
             for release_group in state[WANTED_RELEASE_GROUPS_KEY][artist_id]:
                 if release_group['status'] == 'wanted' or (release_group['status'] == 'pending' and time.time() - release_group['exec_timestamp'] > self.config['exec_timeout'].as_number()):
@@ -154,7 +155,7 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
                     self._save_state(state)
 
     def update_wanted_albums(self, lib, opts, args):
-        state = _open_state()
+        state = self._open_state()
 
         if MONITORED_ARTISTS_KEY not in state:
             self._log.info('No monitored artists. Wanted albums update skipped.')
@@ -223,15 +224,32 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
         print_('name: {1} | mb_id: {0}'.format(*artist))
             
     def _save_state(self, state):
-        _save_state(state)
+        """Writes the state dictionary out to disk."""
+        try:
+            with open(self.config['statefile'].as_filename(), 'wb') as f:
+                pickle.dump(state, f)
+        except OSError as exc:
+            self._log.error('state file could not be written: {0}', exc)
 
     def _open_state(self):
-        state = _open_state()
+        """Reads the state file, returning a dictionary."""
+        try:
+            with open(self.config['statefile'].as_filename(), 'rb') as f:
+                state = pickle.load(f)
+        except Exception as exc:
+            # The `pickle` module can emit all sorts of exceptions during
+            # unpickling, including ImportError. We use a catch-all
+            # exception to avoid enumerating them all (the docs don't even have a
+            # full list!).
+            self._log.debug('state file could not be read: {0}', exc)
+            state = {}
+            
         if MONITORED_ARTISTS_KEY not in state:
             state[MONITORED_ARTISTS_KEY] = {}
             
         if WANTED_RELEASE_GROUPS_KEY not in state:
             state[WANTED_RELEASE_GROUPS_KEY] = {}
+
         return state
     
     def _get_album_artists(self, items):

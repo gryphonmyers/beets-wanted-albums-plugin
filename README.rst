@@ -124,8 +124,19 @@ The ``exec_timeout`` option indicates how long (in seconds) the ``execwanted`` c
 will wait before re-executing your configured command for a given album.
 
 .. code:: yaml
-    follow:
+    wantedalbums:
         exec_timeout: 9000
+
+        
+
+[statefile=wantedalbums.pickle]
+~~~~~~~
+
+The ``statefile`` option determines where this plugin will store persistent data.
+
+.. code:: yaml
+    wantedalbums:
+        statefile: mycustomstatefilename.pickle
 
 Additional Thoughts
 ~~~~~~~~~~~~~~~~~~~

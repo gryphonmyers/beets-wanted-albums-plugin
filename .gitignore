@@ -3,3 +3,4 @@ config.yml
 library.db
 .vscode
 virtual-env
+beets-env
