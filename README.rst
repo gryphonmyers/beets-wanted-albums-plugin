@@ -130,9 +130,9 @@ will wait before re-executing your configured command for a given album.
 Additional Thoughts
 ~~~~~~~~~~~~~~~~~~~
 
-The idea here is to manually curate your monitored artists, then run updatewanted
-and execwanted regularly (e.g. via cron) in order to automatically get albums you
+The idea here is to manually curate your monitored artists, then run ``updatewanted``
+and ``execwanted`` regularly (e.g. via cron) in order to automatically get albums you
 care about into your library. 
 
-Please don't let this plugin run multiple commands at the same time. Concurrency
-handling is not great at the moment.
+Please don't let this plugin run multiple commands (or instances of the same command)
+at the same time. Concurrency handling is not great at the moment.
