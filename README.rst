@@ -67,7 +67,8 @@ updatewanted
 ``beet updatewanted [query]``
 
 Searches Musicbrainz for release groups (albums) that have an album artist
-matching any of your monitored artists. All matching albums will be stored in the
+that matches any of your monitored artists, are not already on your wanted list,
+and are not already in your library. All matching albums will be added to your
 list of wanted albums.
 
 If no query is included, albums will be searched for all monitored artists.
