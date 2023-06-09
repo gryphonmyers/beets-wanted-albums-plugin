@@ -102,7 +102,7 @@ exec_command
 ~~~~~~~~
 
 An executable command (e.g. a path to a bash script) that will be run for each wanted
-albums when ``execwanted`` is run.
+album when ``execwanted`` is run.
 
 .. code:: yaml
 
@@ -115,7 +115,7 @@ The command will be run with the following arguments:
 2. The title of the album
 3. The musicbrainz artist id of the album's artist
 4. The name of the album's artist
-5. The number of times a command has been previously executed for this album (see ``exec_timeout`` option)
+5. The number of times a command has been previously executed for this album.
 
 [exec_timeout=5000]
 ~~~~~~~
@@ -126,3 +126,13 @@ will wait before re-executing your configured command for a given album.
 .. code:: yaml
     follow:
         exec_timeout: 9000
+
+Additional Thoughts
+~~~~~~~~~~~~~~~~~~~
+
+The idea here is to manually curate your monitored artists, then run updatewanted
+and execwanted regularly (e.g. via cron) in order to automatically get albums you
+care about into your library. 
+
+Please don't let this plugin run multiple commands at the same time. Concurrency
+handling is not great at the moment.
