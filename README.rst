@@ -15,9 +15,6 @@ Instructions
     cd beets-wanted-albums-plugin
     python setup.py install
 
-Configuration
--------------
-
 Add ``wantedalbums`` to the
 `plugins <http://beets.readthedocs.org/en/latest/plugins/index.html#using-plugins>`__
 option in your Beets
@@ -27,58 +24,10 @@ option in your Beets
 
     plugins: wantedalbums
 
-exec Configuration
-~~~~~~~~~~~~~~~~~~~
-
-This plugin allows you to execute arbitrary commands when albums are missing from your
-library via the ``execwanted`` command. What this command does it totally up to you, but
-here are some suggestions:
-
-* Trigger a notification via your messaging platform of choice
-* Add the album to a playlist on your streaming platform of choice
-* Add the album to your shopping wishlist
-* Automate purchase of album, adding purchased files to your Beets import folder
-
-Whatever you want to do is up to you, just make sure to set the ``exec_command`` key of
-the ``wantedalbums`` key of your config. Make sure the process running beets has
-permission to execute this command.
-
-.. code:: yaml
-
-    wantedalbums:
-        exec_command: '/home/mr-guy/my-scripts/wanted-album-exec.sh'
-
-This command will be execute for every wanted album discovered by this plugin, whenever
-the ``execwanted`` command is run. The command will be run with the following arguments:
-
-1. The musicbrainz release group id of the wanted album
-2. The title of the album
-3. The musicbrainz artist id of the album's artist
-4. The name of the album's artist
-5. The number of times a command has been previously executed for this album (see ``exec_timeout`` option)
-
-.. code:: yaml
-    #!/bin/bash
-    result=$(curl https://my-website/my-special-api-for-handling-wanted-albums/?release_group_id=$1&artist_id=$3)
-
-Options
-~~~~~~~
-
-The ``exec_timeout`` option indicates how long (in seconds) the plugin will wait
-before re-executing your configured command for a given album.
-
-.. code:: yaml
-    follow:
-        exec_timeout: 9000
-
-The assumption is that when you run the ``execwanted`` command, whatever kind of
-processing you want to use to get the wanted album into your library will kick off.
-That could very easily take some time, but the amount of time varies wildly depending
-on what you're doing. If something goes wrong and the album never makes it into your
-library, the plugin will try again.
 
 Commands
 --------
+This plugin adds several new commands to Beets, allowing you to curate and act upon your wanted albums list.
 
 monitor
 ~~~~~~~~
@@ -102,3 +51,77 @@ no longer include these artists (any currently wanted albums will remain -
 if you want those removed, use the ``unwant`` command).
 
 If no query is included, all album artists in your library will be unmonitored.
+
+listmonitored
+~~~~~~~~
+
+``beet listmonitored [query]``
+
+Lists out any monitored album artist(s) of the items matching the provided query.
+
+If no query is included, all monitored artists will be listed.
+
+updatewanted
+~~~~~~~~
+
+``beet updatewanted [query]``
+
+Searches Musicbrainz for release groups (albums) that have an album artist
+matching any of your monitored artists. All matching albums will be stored in the
+list of wanted albums.
+
+If no query is included, albums will be searched for all monitored artists.
+
+listwanted
+~~~~~~~~
+
+``beet listwanted``
+
+Lists all wanted albums.
+
+execwanted
+~~~~~~~~
+
+``beet execwanted``
+
+Executes a command for each wanted album. If that command does not error, the album
+will be marked as ``pending``. Pending albums will not be included in subsequent 
+calls of ``execwanted`` until the configured ``exec_timeout`` has passed OR the album
+has been imported into your library. 
+
+The intended purpose of this command is for you to run a script that will eventually 
+lead to the album being imported into your library. If something goes wrong and the 
+album never makes it into your library, ``exec_timeout`` allows you to have the plugin 
+try again.
+
+Configuration
+~~~~~~~~~~~~~~~~~~~
+
+exec_command
+~~~~~~~~
+
+An executable command (e.g. a path to a bash script) that will be run for each wanted
+albums when ``execwanted`` is run.
+
+.. code:: yaml
+
+    wantedalbums:
+        exec_command: '/home/mr-guy/my-scripts/wanted-album-exec.sh'
+
+The command will be run with the following arguments:
+
+1. The musicbrainz release group id of the wanted album
+2. The title of the album
+3. The musicbrainz artist id of the album's artist
+4. The name of the album's artist
+5. The number of times a command has been previously executed for this album (see ``exec_timeout`` option)
+
+[exec_timeout=5000]
+~~~~~~~
+
+The ``exec_timeout`` option indicates how long (in seconds) the ``execwanted`` command
+will wait before re-executing your configured command for a given album.
+
+.. code:: yaml
+    follow:
+        exec_timeout: 9000

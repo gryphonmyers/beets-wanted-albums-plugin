@@ -170,7 +170,7 @@ class BeetsWantedAlbumsPlugin(BeetsPlugin):
         if len(monitored_artists) == 0:
             self._log.info('No monitored artists match that query.')
             return
-        
+        """ TODO add all artist ids to the same query instead of iterating artists """
         for artist in monitored_artists:
             def get_album_release_group(album):
                 return album.get('mb_releasegroupid')
