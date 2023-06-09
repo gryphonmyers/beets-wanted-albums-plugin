@@ -87,8 +87,8 @@ execwanted
 
 Executes a command for each wanted album. If that command does not error, the album
 will be marked as ``pending``. Pending albums will not be included in subsequent 
-calls of ``execwanted`` until the configured ``exec_timeout`` has passed OR the album
-has been imported into your library. 
+calls of ``execwanted`` until the configured ``exec_timeout`` has passed, and only 
+if the album has not been imported into your library by then. 
 
 The intended purpose of this command is for you to run a script that will eventually 
 lead to the album being imported into your library. If something goes wrong and the 
